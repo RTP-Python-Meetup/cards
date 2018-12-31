@@ -1,6 +1,6 @@
 import random
 
-class card(object):
+class Card(object):
 
     def __init__(self, suit, rank):
         self.__suit = suit
@@ -31,16 +31,9 @@ class card(object):
         return str(self)
 
 
-class deck(object):
-
-    def __init__(self):
-        self.cards = list(card(suit, rank) for suit in 'CDSH' for rank in range(1,14))
-
-    def deal_random_card(self):
-        return self.cards.pop(random.randint(0, len(self.cards)))
 
 
-class card_container(object):
+class CardContainer(object):
 
     def __init__(self):
         self.__cards = []
@@ -51,6 +44,10 @@ class card_container(object):
     @property
     def cards(self):
         return sorted(self.__cards, key=lambda card: card.position)
+
+    @cards.setter
+    def cards(self, cards):
+        self.__cards = cards
 
     @property
     def cards_by_rank(self):
@@ -64,12 +61,21 @@ class card_container(object):
         return ', '.join((str(card) for card in self.cards))
 
 
-my_deck = deck()
+class Deck(CardContainer):
 
-p1_hand = card_container()
-p1_playable = card_container()
-p2_hand = card_container()
-p2_playable = card_container()
+    def __init__(self):
+        self.cards = list(Card(suit, rank) for suit in 'CDSH' for rank in range(1,14))
+
+    def deal_random_card(self):
+        return self.cards.pop(random.randint(0, len(self.cards)))
+
+
+my_deck = Deck()
+
+p1_hand = CardContainer()
+p1_playable = CardContainer()
+p2_hand = CardContainer()
+p2_playable = CardContainer()
 
 card = my_deck.deal_random_card()
 p1_hand.add(card)
@@ -85,7 +91,7 @@ card = my_deck.deal_random_card()
 p2_hand.add(card)
 p2_playable.add(card)
 
-community = card_container()
+community = CardContainer()
 
 card = my_deck.deal_random_card()
 community.add(card)
