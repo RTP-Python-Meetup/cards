@@ -27,11 +27,6 @@ class Card(object):
     def __str__(self):
         return "{} {}".format(self.suit, self.rank)
 
-    def __repr__(self):
-        return str(self)
-
-
-
 
 class CardContainer(object):
 
@@ -57,9 +52,8 @@ class CardContainer(object):
     def cards_by_suit(self):
         return sorted(self.__cards, key=lambda card: card.suit)
 
-    def __repr__(self):
-        return ', '.join((str(card) for card in self.cards))
-
+    def to_json(self):
+        return json.dumps([str(card) for card in self.cards])
 
 class Deck(CardContainer):
 
@@ -70,76 +64,75 @@ class Deck(CardContainer):
         return self.cards.pop(random.randint(0, len(self.cards) - 1))
 
 
-my_deck = Deck()
+class Player(object):
 
-p1_hand = CardContainer()
-p1_playable = CardContainer()
-p2_hand = CardContainer()
-p2_playable = CardContainer()
+    def __init__(self):
+        self.hand = CardContainer()
+        self.community = None
 
-card = my_deck.deal_random_card()
-p1_hand.add(card)
-p1_playable.add(card)
-card = my_deck.deal_random_card()
-p1_hand.add(card)
-p1_playable.add(card)
+    @property
+    def playable_cards(self):
+        return self.hand.cards + self.community.cards
 
-card = my_deck.deal_random_card()
-p2_hand.add(card)
-p2_playable.add(card)
-card = my_deck.deal_random_card()
-p2_hand.add(card)
-p2_playable.add(card)
 
-community = CardContainer()
+def holdem(player_count=2):
+    # Create deck
+    deck = Deck()
+    community = CardContainer()
 
-card = my_deck.deal_random_card()
-community.add(card)
-p1_playable.add(card)
-p2_playable.add(card)
-card = my_deck.deal_random_card()
-community.add(card)
-p1_playable.add(card)
-p2_playable.add(card)
-card = my_deck.deal_random_card()
-community.add(card)
-p1_playable.add(card)
-p2_playable.add(card)
+    # Create players
+    players = []
+    for i in range(0, player_count):
+        players.append(Player())
+        players[-1].community = community
 
-print('start')
-print(p1_hand)
-print(p2_hand)
-print('flop')
-print(community)
-print(p1_playable)
-print(p1_playable.cards_by_rank)
-print(p1_playable.cards_by_suit)
-print(p2_playable)
-print(p2_playable.cards_by_rank)
-print(p2_playable.cards_by_suit)
+    # Deal
+    for player in players:
+        player.hand.add(deck.deal_random_card())
+        player.hand.add(deck.deal_random_card())
 
-print('turn')
-card = my_deck.deal_random_card()
-community.add(card)
-p1_playable.add(card)
-p2_playable.add(card)
+    # Show players hands:
+    print('Pre-flop')
+    for player in players:
+        print(player, end=": ")
+        print(list(str(card) for card in player.playable_cards))
+    print(community, end=": ")
+    print(list(str(card) for card in community.cards))
 
-print(p1_playable)
-print(p1_playable.cards_by_rank)
-print(p1_playable.cards_by_suit)
-print(p2_playable)
-print(p2_playable.cards_by_rank)
-print(p2_playable.cards_by_suit)
+    # Flop
+    community.add(deck.deal_random_card())
+    community.add(deck.deal_random_card())
+    community.add(deck.deal_random_card())
 
-print('river')
-card = my_deck.deal_random_card()
-community.add(card)
-p1_playable.add(card)
-p2_playable.add(card)
+    # Show players hands:
+    print('Flop')
+    for player in players:
+        print(player, end=": ")
+        print(list(str(card) for card in player.playable_cards))
+    print(community, end=": ")
+    print(list(str(card) for card in community.cards))
 
-print('p1_playable:', p1_playable)
-print(p1_playable.cards_by_rank)
-print(p1_playable.cards_by_suit)
-print('p2_playable:', p2_playable)
-print(p2_playable.cards_by_rank)
-print(p2_playable.cards_by_suit)
+    # Turn
+    community.add(deck.deal_random_card())
+
+    # Show players hands:
+    print('Turn')
+    for player in players:
+        print(player, end=": ")
+        print(list(str(card) for card in player.playable_cards))
+    print(community, end=": ")
+    print(list(str(card) for card in community.cards))
+
+    # River
+    community.add(deck.deal_random_card())
+
+    # Show players hands:
+    print('River')
+    for player in players:
+        print(player, end=": ")
+        print(list(str(card) for card in player.playable_cards))
+    print(community, end=": ")
+    print(list(str(card) for card in community.cards))
+
+
+holdem()
