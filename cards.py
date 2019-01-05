@@ -67,7 +67,7 @@ class Deck(CardContainer):
         self.cards = list(Card(suit, rank) for suit in 'CDSH' for rank in range(1,14))
 
     def deal_random_card(self):
-        return self.cards.pop(random.randint(0, len(self.cards)))
+        return self.cards.pop(random.randint(0, len(self.cards) - 1))
 
 
 my_deck = Deck()
