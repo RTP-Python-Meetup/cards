@@ -36,6 +36,16 @@ class CardContainer(object):
     def add(self, card):
         self.__cards.append(card)
 
+    def shuffle(self):
+        shuffled = []
+        while self.cards:
+            if len(self.cards) > 1:
+                index = random.randint(0, len(self.cards) - 1)
+            else:
+                index = 0
+            shuffled.append(self.cards.pop(index))
+        self.__cards = shuffled
+
     @property
     def cards(self):
         return self.__cards
@@ -55,13 +65,23 @@ class CardContainer(object):
     def to_json(self):
         return json.dumps([str(card) for card in self.cards])
 
+    def to_list(self):
+        return list(str(card) for card in self.cards)
+
+
 class Deck(CardContainer):
 
-    def __init__(self):
+    def __init__(self, shuffle=True):
         self.cards = list(Card(suit, rank) for suit in 'CDSH' for rank in range(1,14))
+        if shuffle:
+            self.shuffle()
 
     def deal_random_card(self):
-        return self.cards.pop(random.randint(0, len(self.cards) - 1))
+        if len(self.cards) > 1:
+            index = random.randint(0, len(self.cards) - 1)
+        else:
+            index = 0
+        return self.cards.pop(index)
 
 
 class Player(object):
@@ -76,20 +96,23 @@ class Player(object):
 
 
 def holdem(player_count=2):
-    # Create deck
+    # Create community and list for containing players
     deck = Deck()
     community = CardContainer()
+    players = []
+    print(deck, end=": ")
+    print(deck.to_list())
+
 
     # Create players
-    players = []
     for i in range(0, player_count):
         players.append(Player())
         players[-1].community = community
 
     # Deal
     for player in players:
-        player.hand.add(deck.deal_random_card())
-        player.hand.add(deck.deal_random_card())
+        player.hand.add(deck.cards.pop())
+        player.hand.add(deck.cards.pop())
 
     # Show players hands:
     print('Pre-flop')
@@ -100,9 +123,9 @@ def holdem(player_count=2):
     print(list(str(card) for card in community.cards))
 
     # Flop
-    community.add(deck.deal_random_card())
-    community.add(deck.deal_random_card())
-    community.add(deck.deal_random_card())
+    community.add(deck.cards.pop())
+    community.add(deck.cards.pop())
+    community.add(deck.cards.pop())
 
     # Show players hands:
     print('Flop')
@@ -113,7 +136,7 @@ def holdem(player_count=2):
     print(list(str(card) for card in community.cards))
 
     # Turn
-    community.add(deck.deal_random_card())
+    community.add(deck.cards.pop())
 
     # Show players hands:
     print('Turn')
@@ -124,7 +147,7 @@ def holdem(player_count=2):
     print(list(str(card) for card in community.cards))
 
     # River
-    community.add(deck.deal_random_card())
+    community.add(deck.cards.pop())
 
     # Show players hands:
     print('River')
