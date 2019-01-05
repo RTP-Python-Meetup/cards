@@ -43,11 +43,11 @@ class CardContainer(object):
 
     @property
     def cards(self):
-        return sorted(self.__cards, key=lambda card: card.position)
+        return self.__cards
 
     @cards.setter
     def cards(self, cards):
-        self.__cards = cards
+        self.__cards = sorted(cards, key=lambda card: card.position)
 
     @property
     def cards_by_rank(self):
