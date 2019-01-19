@@ -38,14 +38,7 @@ class CardContainer(object):
         self.__cards.append(card)
 
     def shuffle(self):
-        shuffled = []
-        while self.cards:
-            if len(self.cards) > 1:
-                index = random.randint(0, len(self.cards) - 1)
-            else:
-                index = 0
-            shuffled.append(self.cards.pop(index))
-        self.__cards = shuffled
+        return random.shuffle(self.__cards)
 
     @property
     def cards(self):
